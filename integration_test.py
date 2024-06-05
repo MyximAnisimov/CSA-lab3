@@ -1,10 +1,11 @@
 import contextlib
 import io
 import logging
-import machine
 import os
-import pytest
 import tempfile
+
+import machine
+import pytest
 import translator
 
 
