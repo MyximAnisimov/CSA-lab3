@@ -4,20 +4,23 @@
 
 Выполнил
 ---
+
 Анисимов Максим Дмитриевич P3233
 
 Вариант (упрощённый)
 ---
+
 > Базовый вариант: alg | risc | neum | hw | instr | binary | stream | mem | pstr | prob1 | cache
 >
->  Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
+> Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
 
 Синтаксис языка
 ---
+
 Синтаксис в расширенной БНФ
-* ```[...]``` - вхождение 0 или 1 раз
-* ```{...}``` - вхождение 0 или несколько раз
-* ```{...}```- - вхождение 1 или несколько раз
+* `[...]` - вхождение 0 или 1 раз
+* `{...}` - вхождение 0 или несколько раз
+* `{...}`- - вхождение 1 или несколько раз
 
 ### Форма Бэкуса-Наура
 ```
@@ -216,7 +219,7 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Реализовано в модуле: [machine](https://github.com/MyximAnisimov/CSA-lab3/blob/main/machine.py)
 ### DataPath
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath1.svg)
+![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
 
 Реализован в классе ```DataPath```
 
