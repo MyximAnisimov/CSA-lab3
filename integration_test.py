@@ -4,9 +4,12 @@ import logging
 import os
 import tempfile
 
-import machine
 import pytest
+
+import machine
 import translator
+
+
 @pytest.mark.golden_test("golden/*.yml")
 def test_translator_and_machine(golden, caplog):
     caplog.set_level(logging.DEBUG)

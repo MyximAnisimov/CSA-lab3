@@ -13,7 +13,6 @@ from isa import (
 
 
 def command_to_opcode(command):
-
     return {
         "nop": Opcode.NOP,
         "hlt": Opcode.HLT,
@@ -80,7 +79,9 @@ def word_is_str(word: str) -> bool:
     return word.startswith("'") and word.endswith("'")
 
 
-PROGRAM_START_POSITION_IN_MEMORY = 4  # Считается, что до этого хранится служебная информация, изменение которой недопустимо
+PROGRAM_START_POSITION_IN_MEMORY = (
+    4  # Считается, что до этого хранится служебная информация, изменение которой недопустимо
+)
 
 
 def find_labels(lines: list[str]) -> dict:

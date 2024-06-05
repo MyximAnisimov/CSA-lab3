@@ -119,24 +119,24 @@ class ALU:
 
 
 MEMORY_SIZE = 65536
-MAX_ARG = 4294967296  # 2 в 32 степени
+MAX_ARG = 4294967296
 INPUT_BUFFER_INDEX = 1
 OUTPUT_STR_BUFFER_INDEX = 2
 OUTPUT_INT_BUFFER_INDEX = 3
 
 
 class DataPath:
-    memory: list[dict[str, str]]  # Память, инициализируется nop-ами
-    registers: list  # Регистры общего назначения, инициализируется нулями
-    ps: dict[str, bool]  # Регистр состояния, инициализируется данным АЛУ
-    dr: dict  # Регистр данных, инициализируется nop-ом
-    ir: dict  # Регистр исполняемой инструкции, инициализируется nop-ом
-    pc: dict  # Счетчик команд, инициализируется 0 адресом
-    ar: int  # Регистр адреса, инициализируется 0 адресом
-    input_buffer: list  # Входной буффер данных
-    output_str_buffer: list  # Выходной буфер символов
-    output_int_buffer: list  # Выходной буфер цифр
-    alu: ALU  # АЛУ
+    memory: list[dict[str, str]]
+    registers: list
+    ps: dict[str, bool]
+    dr: dict
+    ir: dict
+    pc: dict
+    ar: int
+    input_buffer: list
+    output_str_buffer: list
+    output_int_buffer: list
+    alu: ALU
 
     def __init__(self, input_buffer: list):
         self.alu = ALU()
@@ -196,8 +196,6 @@ class DataPath:
             "is_indirect_2": None,
         }
 
-
-    
     def read_from_memory(self) -> dict:
         assert self.ar >= 0, "Address below memory limit"
         assert self.ar <= MEMORY_SIZE, "Address above memory limit"
@@ -434,15 +432,15 @@ class ControlUnit:
         assert not (str(arg_1).startswith("r") and is_indirect_1), "Indirect addressing with regs is prohibited"
         assert not (str(arg_2).startswith("r") and is_indirect_2), "Indirect addressing with regs is prohibited"
 
-        if str(arg_1).startswith("r"):  # Читаем откуда-то в регистр
+        if str(arg_1).startswith("r"):
             num_reg_1 = int(arg_1[1::])
-            if str(arg_2).startswith("r"):  # Читаем из регистра в регистр
+            if str(arg_2).startswith("r"):
                 num_reg_2 = int(arg_2[1::])
                 self.data_path.signal_execute_alu_op(
                     ALUOpcode.SKIP_B, right_sel=Selectors[f"from_r{num_reg_2}_to_alu_b".upper()]
                 )
                 self.data_path.signal_latch_general_register(num_reg_1, Selectors[f"from_alu_to_r{num_reg_1}".upper()])
-            else:  # Читаем из памяти в регистр
+            else:
                 if is_indirect_2:
                     self.data_path.signal_latch_general_register(
                         num_reg_1, Selectors[f"from_memory_to_r{num_reg_1}".upper()]
@@ -453,8 +451,8 @@ class ControlUnit:
                     self.data_path.signal_latch_general_register(
                         num_reg_1, Selectors[f"from_memory_to_r{num_reg_1}".upper()]
                     )
-        else:  # Записываем в память
-            if str(arg_2).startswith("r"):  # Записываем в память из регистра
+        else:
+            if str(arg_2).startswith("r"):
                 num_reg_2 = int(arg_2[1::])
                 if is_indirect_1:
                     self.data_path.signal_write(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
@@ -462,7 +460,7 @@ class ControlUnit:
                     self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                     self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
                     self.data_path.signal_write(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
-            else:  # Попытка записать из памяти в память
+            else:
                 error_message = "Mem-to-mem operations prohibited"
                 raise AssertionError(error_message)
 
@@ -580,6 +578,7 @@ def parse_to_tokens(input_file: str) -> list:
             input_token = eval(input_text)
     return input_token
 
+
 def main(code_file: str, input_file: str):
     code = read_code(code_file)
     input_token = parse_to_tokens(input_file)
@@ -592,7 +591,6 @@ def main(code_file: str, input_file: str):
 
 
 FORMAT = " %(levelname)s    %(filename)s    %(message)s"
-
 
 if __name__ == "__main__":
     logging.basicConfig(format=FORMAT)
