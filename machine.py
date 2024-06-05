@@ -4,16 +4,7 @@ import logging
 import sys
 from typing import ClassVar
 
-from isa import (
-    ALUOpcode,
-    Opcode,
-    Selectors,
-    op3,
-    op1,
-    read_code,
-    op2,
-    op0,
-)
+from isa import ALUOpcode, Opcode, Selectors, op0, op1, op2, op3, read_code
 
 
 class ALU:

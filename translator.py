@@ -2,14 +2,7 @@ from __future__ import annotations
 
 import sys
 
-from isa import (
-    Opcode,
-    op3,
-    op1,
-    op2,
-    write_code,
-    op0,
-)
+from isa import Opcode, op0, op1, op2, op3, write_code
 
 
 def command_to_opcode(command):
