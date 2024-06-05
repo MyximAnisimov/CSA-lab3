@@ -7,7 +7,8 @@
 Вариант (упрощённый)
 ---
 > Базовый вариант: alg | risc | neum | hw | instr | binary | stream | mem | pstr | prob1 | cache
-> Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
+>
+>  Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
 
 Синтаксис языка
 ---
@@ -213,7 +214,7 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Реализовано в модуле: [machine](https://github.com/MyximAnisimov/CSA-lab3/blob/main/machine.py)
 ### DataPath
-![Image alt](https://github.com/MyximAnisimov/itmo_study/blob/main/2_year/Computer_Architecture/Labwork3/DataPath1.png)
+![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
 
 Реализован в классе ```DataPath```
 
@@ -253,7 +254,7 @@ comment ::= ";" { <any symbol except "\n"> }
 -```signal_execute_operation_on_alu``` - записать в память по адресу в ```ar```
 
 ### Control Unit
-![Image alt](https://github.com/MyximAnisimov/itmo_study/blob/main/2_year/Computer_Architecture/Labwork3/ControlUnit.png)
+![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/ControlUnit.png)
 
 Реализован в классе ```ControlUnit```
 
@@ -583,6 +584,7 @@ integration_test.py::test_translator_and_machine[golden/prob1.yml] PASSED [ 80%]
 integration_test.py::test_translator_and_machine[golden/test.yml] PASSED [100%]
 
 ======================= 5 passed in 0.49s ========================
+```
 ```
 | ФИО                        | алг             | LoC | code байт | code инстр. | инстр. | такт. | вариант                                                                   |
 | Анисимов Максим Дмитриевич | hello           | 43  | -         | 43          | 114    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
