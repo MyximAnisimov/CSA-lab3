@@ -52,8 +52,8 @@ def delete_comments(lines: list[str]) -> list[str]:
         if comment_index == -1:
             lines_without_comments.append(line)
         elif comment_index != 0:
-            if line[:comment_index].count("'") % 2 == 1 and line[comment_index + 1 :].count("'") % 2 == 1:
-                comment_index_new = line[comment_index + 1 :].find(";")
+            if line[:comment_index].count("'") % 2 == 1 and line[comment_index + 1:].count("'") % 2 == 1:
+                comment_index_new = line[comment_index + 1:].find(";")
                 if comment_index_new == -1:
                     lines_without_comments.append(line)
                 else:
@@ -187,12 +187,14 @@ def parse_address(address: str, opcode: Opcode, labels: dict) -> tuple[str, bool
     else:
         is_indirect = False
 
-    assert address.isdigit() or address in labels or address in REGISTERS, "Code error: missing address " + address
+    assert address.isdigit(
+    ) or address in labels or address in REGISTERS, "Code error: missing address " + address
 
     in_labels = address in labels
     if in_labels:
         if opcode != Opcode.MOV and opcode not in op3:
-            raise AssertionError("Code error: command " + str(opcode) + " only register-to-register")
+            raise AssertionError("Code error: command " +
+                                 str(opcode) + " only register-to-register")
         address = str(labels[address])
 
     return address, is_indirect, in_labels
@@ -209,25 +211,33 @@ def parse_command_to_code(line: str, position: int, labels: dict) -> dict:
     is_indirect_2 = None
 
     if command in op0:
-        assert len(line.split(" ")) == 1, "Code error: the command " + command + " must have 0 args"
+        assert len(line.split(" ")) == 1, "Code error: the command " + \
+            command + " must have 0 args"
 
     elif command in op3 or command in op1:
-        assert len(line[len(command) + 1 : :].split(", ")) == 1, (
+        assert len(line[len(command) + 1::].split(", ")) == 1, (
             "Code error: the command " + command + " must have 1 args"
         )
-        arg_1, is_indirect_1, in_labels_1 = parse_address(line[len(command) + 1 : :].split(", ")[0], opcode, labels)
+        arg_1, is_indirect_1, in_labels_1 = parse_address(
+            line[len(command) + 1::].split(", ")[0], opcode, labels)
 
     elif command in op2:
-        assert len(line[len(command) + 1 : :].split(", ")) == 2, (
+        assert len(line[len(command) + 1::].split(", ")) == 2, (
             "Code error: the command " + command + " must have 2 args"
         )
-        args = line[len(command) + 1 : :].split(", ")
-        arg_1, is_indirect_1, in_labels_1 = parse_address(args[0], opcode, labels)
-        arg_2, is_indirect_2, in_labels_2 = parse_address(args[1], opcode, labels)
-        assert not (in_labels_1 and in_labels_2), "Code error: mem-to-mem operations prohibited"
-        assert not (is_indirect_1 and is_indirect_2), "Code error: double indirect addressing is prohibited"
-        assert not (arg_1.startswith("r") and is_indirect_1), "Code error: indirect addressing with regs is prohibited"
-        assert not (arg_2.startswith("r") and is_indirect_2), "Code error: indirect addressing with regs is prohibited"
+        args = line[len(command) + 1::].split(", ")
+        arg_1, is_indirect_1, in_labels_1 = parse_address(
+            args[0], opcode, labels)
+        arg_2, is_indirect_2, in_labels_2 = parse_address(
+            args[1], opcode, labels)
+        assert not (
+            in_labels_1 and in_labels_2), "Code error: mem-to-mem operations prohibited"
+        assert not (
+            is_indirect_1 and is_indirect_2), "Code error: double indirect addressing is prohibited"
+        assert not (arg_1.startswith(
+            "r") and is_indirect_1), "Code error: indirect addressing with regs is prohibited"
+        assert not (arg_2.startswith(
+            "r") and is_indirect_2), "Code error: indirect addressing with regs is prohibited"
 
     return {
         "index": position,
@@ -250,7 +260,8 @@ def find_code(lines: list[str], labels: dict) -> list:
         elif is_word(line):  # Строка соответствует данным
             word = line[6::]
             if word_is_str(word):  # Данные строкового типа
-                position += len(word[1:-1]) + 1  # +1, так как считаем нуль-терминатор
+                # +1, так как считаем нуль-терминатор
+                position += len(word[1:-1]) + 1
             else:  # Данные числового типа или сслыка на метку
                 position += 1
     return code
@@ -294,6 +305,7 @@ def main(source_filename: str, target_filename: str):
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 3, "Wrong arguments: translator.py <input_file> <target_file>"
+    assert len(
+        sys.argv) == 3, "Wrong arguments: translator.py <input_file> <target_file>"
     _, source_filename, target_filename = sys.argv
     main(source_filename, target_filename)
