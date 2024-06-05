@@ -54,16 +54,8 @@ class ALU:
             self.result = self.src_a.copy()
             self.result["arg_1"] = int(self.result["arg_1"]) + 1
             self.set_flags()
-        elif self.operation == ALUOpcode.INC_B:
-            self.result = self.src_b.copy()
-            self.result["arg_1"] = int(self.result["arg_1"]) + 1
-            self.set_flags()
         elif self.operation == ALUOpcode.DEC_A:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(self.result["arg_1"]) - 1
-            self.set_flags()
-        elif self.operation == ALUOpcode.DEC_B:
-            self.result = self.src_b.copy()
             self.result["arg_1"] = int(self.result["arg_1"]) - 1
             self.set_flags()
         elif self.operation == ALUOpcode.ADD:
@@ -94,9 +86,6 @@ class ALU:
             self.result = self.src_a.copy()
         elif self.operation == ALUOpcode.SKIP_B:
             self.result = self.src_b.copy()
-        else:
-            error_message = f"Unknown ALU operation: {self.operation}"
-            raise AssertionError(error_message)
 
     def set_flags(self):
         self.n_flag = int(self.result["arg_1"]) < 0
