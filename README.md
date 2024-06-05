@@ -214,7 +214,7 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Реализовано в модуле: [machine](https://github.com/MyximAnisimov/CSA-lab3/blob/main/machine.py)
 ### DataPath
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
+![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath1.svg)
 
 Реализован в классе ```DataPath```
 
