@@ -84,7 +84,7 @@ class ALU:
             self.set_flags()
         elif self.operation == ALUOpcode.SKIP_A:
             self.result = self.src_a.copy()
-        elif self.operation == ALUOpcode.SKIP_B:
+        else:
             self.result = self.src_b.copy()
 
     def set_flags(self):
