@@ -77,33 +77,27 @@ class ALU:
             self.set_flags()
         elif self.operation == ALUOpcode.ADD:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) + int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) + int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.SUB:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) - int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) - int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.MUL:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) * int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) * int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.DIV:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) / int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) / int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.MOD:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) % int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) % int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.TEST:
             self.result = self.src_a.copy()
-            self.result["arg_1"] = int(
-                self.src_a["arg_1"]) & int(self.src_b["arg_1"])
+            self.result["arg_1"] = int(self.src_a["arg_1"]) & int(self.src_b["arg_1"])
             self.set_flags()
         elif self.operation == ALUOpcode.SKIP_A:
             self.result = self.src_a.copy()
@@ -115,8 +109,7 @@ class ALU:
 
     def set_flags(self):
         self.n_flag = int(self.result["arg_1"]) < 0
-        self.z_flag = int(self.result["arg_1"]
-                          ) == 0 or self.result["arg_1"] is None
+        self.z_flag = int(self.result["arg_1"]) == 0 or self.result["arg_1"] is None
 
     def set_details(self, src_a: dict, src_b: dict, operation: ALUOpcode):
         assert operation in ALU.alu_operations, f"Unknown ALU operation: {
@@ -193,8 +186,7 @@ class DataPath:
 
     def read_from_input_buffer(self) -> dict:
         assert self.input_buffer != [], "Attempt to read from an empty input buffer"
-        arg = ord(self.input_buffer[0]) if isinstance(
-            self.input_buffer[0], str) else self.input_buffer[0]
+        arg = ord(self.input_buffer[0]) if isinstance(self.input_buffer[0], str) else self.input_buffer[0]
         logging.debug("input: %s", repr(self.input_buffer[0]))
         self.input_buffer = self.input_buffer[1::]
         return {
@@ -208,8 +200,7 @@ class DataPath:
     def read_from_memory(self) -> dict:
         assert self.ar >= 0, "Address below memory limit"
         assert self.ar <= MEMORY_SIZE, "Address above memory limit"
-        assert self.ar not in [OUTPUT_STR_BUFFER_INDEX,
-                               OUTPUT_INT_BUFFER_INDEX], "Attempt to read from output buffer"
+        assert self.ar not in [OUTPUT_STR_BUFFER_INDEX, OUTPUT_INT_BUFFER_INDEX], "Attempt to read from output buffer"
 
         if self.ar == INPUT_BUFFER_INDEX:
             result = self.read_from_input_buffer()
@@ -218,8 +209,11 @@ class DataPath:
         return result
 
     def signal_latch_general_register(self, num: int, sel: Selectors):
-        assert sel in [f"from_alu_to_r{num}", f"from_memory_to_r{
-            num}"], f"Unknown selector '{sel}'"
+        assert sel in [
+            f"from_alu_to_r{num}",
+            f"from_memory_to_r{
+            num}",
+        ], f"Unknown selector '{sel}'"
         if sel == f"from_alu_to_r{num}":
             self.registers[num] = self.alu.result
         else:
@@ -239,8 +233,7 @@ class DataPath:
         self.pc["arg_1"] = int(self.alu.result["arg_1"])
 
     def signal_latch_ar(self, sel: Selectors):
-        assert sel in [Selectors.FROM_ADDR1_TO_AR,
-                       Selectors.FROM_ADDR2_TO_AR], f"Unknown selector '{sel}'"
+        assert sel in [Selectors.FROM_ADDR1_TO_AR, Selectors.FROM_ADDR2_TO_AR], f"Unknown selector '{sel}'"
         if sel == Selectors.FROM_ADDR1_TO_AR:
             self.ar = int(self.alu.result["arg_1"])
         else:
@@ -356,12 +349,10 @@ class ControlUnit:
         data_path.signal_fill_memory(program)
 
     def instr_fetch(self):
-        self.data_path.signal_execute_alu_op(
-            ALUOpcode.SKIP_A, left_sel=Selectors.FROM_PC_TO_ALU_A)
+        self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_A, left_sel=Selectors.FROM_PC_TO_ALU_A)
         self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
         self.data_path.signal_latch_ir()
-        self.data_path.signal_execute_alu_op(
-            ALUOpcode.INC_A, left_sel=Selectors.FROM_PC_TO_ALU_A)
+        self.data_path.signal_execute_alu_op(ALUOpcode.INC_A, left_sel=Selectors.FROM_PC_TO_ALU_A)
         self.data_path.signal_latch_pc()
 
     def execute(self):
@@ -372,20 +363,16 @@ class ControlUnit:
             return
 
         if is_indirect_1:
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+            self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
             self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
             self.data_path.signal_latch_dr()
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.SKIP_B, right_sel=Selectors.FROM_DR_TO_ALU_B)
+            self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_DR_TO_ALU_B)
             self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
         elif is_indirect_2:
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+            self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
             self.data_path.signal_latch_ar(Selectors.FROM_ADDR2_TO_AR)
             self.data_path.signal_latch_dr()
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.SKIP_B, right_sel=Selectors.FROM_DR_TO_ALU_B)
+            self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_DR_TO_ALU_B)
             self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
         if opcode in op0:
             self.execute_zero_parameters_instruction(opcode)
@@ -400,8 +387,7 @@ class ControlUnit:
             raise AssertionError(error_message)
 
         if not str(self.data_path.alu.result["arg_1"]).startswith("r"):
-            assert int(
-                self.data_path.alu.result["arg_1"]) < MAX_ARG, "Value exceeded machine word"
+            assert int(self.data_path.alu.result["arg_1"]) < MAX_ARG, "Value exceeded machine word"
 
     def execute_zero_parameters_instruction(self, opcode: Opcode):
         if opcode == Opcode.HLT:
@@ -410,8 +396,7 @@ class ControlUnit:
     def set_selectors_one_params_instr(self, ir) -> tuple[int, Selectors, Selectors]:
         arg_1 = ir["arg_1"]
         assert arg_1 is not None, "None arg_1 in one parameters instruction"
-        assert arg_1.startswith(
-            "r"), "Unknown register in one parameters instruction"
+        assert arg_1.startswith("r"), "Unknown register in one parameters instruction"
 
         num_reg = int(arg_1[1::])
         left_sel = Selectors[f"from_r{num_reg}_to_alu_a".upper()]
@@ -419,28 +404,21 @@ class ControlUnit:
         return num_reg, left_sel, result_reg_sel
 
     def execute_one_parameters_instruction(self, opcode: Opcode, ir):
-        num_reg, left_sel, result_reg_sel = self.set_selectors_one_params_instr(
-            ir)
+        num_reg, left_sel, result_reg_sel = self.set_selectors_one_params_instr(ir)
         if opcode == Opcode.INC:
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.INC_A, left_sel=left_sel)
-            self.data_path.signal_latch_general_register(
-                num_reg, result_reg_sel)
+            self.data_path.signal_execute_alu_op(ALUOpcode.INC_A, left_sel=left_sel)
+            self.data_path.signal_latch_general_register(num_reg, result_reg_sel)
         elif opcode == Opcode.DEC:
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.DEC_A, left_sel=left_sel)
-            self.data_path.signal_latch_general_register(
-                num_reg, result_reg_sel)
+            self.data_path.signal_execute_alu_op(ALUOpcode.DEC_A, left_sel=left_sel)
+            self.data_path.signal_latch_general_register(num_reg, result_reg_sel)
 
     def set_selectors_not_mov_two_params_instr(self, ir) -> tuple[int, int, Selectors, Selectors, Selectors]:
         arg_1 = ir["arg_1"]
         arg_2 = ir["arg_2"]
         assert arg_1 is not None, "None arg_1 in one parameters instruction"
-        assert str(arg_1).startswith(
-            "r"), "Unknown register in one parameters instruction"
+        assert str(arg_1).startswith("r"), "Unknown register in one parameters instruction"
         assert arg_2 is not None, "None arg_2 in one parameters instruction"
-        assert str(arg_2).startswith(
-            "r"), "Unknown register in one parameters instruction"
+        assert str(arg_2).startswith("r"), "Unknown register in one parameters instruction"
 
         num_reg_1 = int(arg_1[1::])
         num_reg_2 = int(arg_2[1::])
@@ -455,49 +433,50 @@ class ControlUnit:
 
         assert arg_1 is not None, "None arg_1 in one parameters instruction"
         assert arg_2 is not None, "None arg_2 in one parameters instruction"
-        assert not (
-            is_indirect_1 and is_indirect_2), "Double indirect addressing is prohibited"
-        assert not (str(arg_1).startswith(
-            "r") and is_indirect_1), "Indirect addressing with regs is prohibited"
-        assert not (str(arg_2).startswith(
-            "r") and is_indirect_2), "Indirect addressing with regs is prohibited"
+        assert not (is_indirect_1 and is_indirect_2), "Double indirect addressing is prohibited"
+        assert not (str(arg_1).startswith("r") and is_indirect_1), "Indirect addressing with regs is prohibited"
+        assert not (str(arg_2).startswith("r") and is_indirect_2), "Indirect addressing with regs is prohibited"
 
         if str(arg_1).startswith("r"):
             num_reg_1 = int(arg_1[1::])
             if str(arg_2).startswith("r"):
                 num_reg_2 = int(arg_2[1::])
                 self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SKIP_B, right_sel=Selectors[f"from_r{
-                        num_reg_2}_to_alu_b".upper()]
+                    ALUOpcode.SKIP_B,
+                    right_sel=Selectors[
+                        f"from_r{
+                        num_reg_2}_to_alu_b".upper()
+                    ],
                 )
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, Selectors[f"from_alu_to_r{num_reg_1}".upper()])
+                self.data_path.signal_latch_general_register(num_reg_1, Selectors[f"from_alu_to_r{num_reg_1}".upper()])
             else:
                 if is_indirect_2:
                     self.data_path.signal_latch_general_register(
-                        num_reg_1, Selectors[f"from_memory_to_r{
-                            num_reg_1}".upper()]
+                        num_reg_1,
+                        Selectors[
+                            f"from_memory_to_r{
+                            num_reg_1}".upper()
+                        ],
                     )
                 else:
-                    self.data_path.signal_execute_alu_op(
-                        ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                    self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                     self.data_path.signal_latch_ar(Selectors.FROM_ADDR2_TO_AR)
                     self.data_path.signal_latch_general_register(
-                        num_reg_1, Selectors[f"from_memory_to_r{
-                            num_reg_1}".upper()]
+                        num_reg_1,
+                        Selectors[
+                            f"from_memory_to_r{
+                            num_reg_1}".upper()
+                        ],
                     )
         else:
             if str(arg_2).startswith("r"):
                 num_reg_2 = int(arg_2[1::])
                 if is_indirect_1:
-                    self.data_path.signal_write(
-                        Selectors[f"from_r{num_reg_2}_to_memory".upper()])
+                    self.data_path.signal_write(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
                 else:
-                    self.data_path.signal_execute_alu_op(
-                        ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                    self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                     self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
-                    self.data_path.signal_write(
-                        Selectors[f"from_r{num_reg_2}_to_memory".upper()])
+                    self.data_path.signal_write(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
             else:
                 error_message = "Mem-to-mem operations prohibited"
                 raise AssertionError(error_message)
@@ -506,65 +485,47 @@ class ControlUnit:
         if opcode == Opcode.MOV:
             self.resolve_mov_instruction(ir)
         else:
-            num_reg_1, num_reg_2, left_sel, right_sel, result_reg_sel = self.set_selectors_not_mov_two_params_instr(
-                ir)
+            num_reg_1, num_reg_2, left_sel, right_sel, result_reg_sel = self.set_selectors_not_mov_two_params_instr(ir)
             if opcode == Opcode.ADD:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.ADD, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.ADD, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
             elif opcode == Opcode.SUB:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SUB, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.SUB, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
             elif opcode == Opcode.MUL:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.MUL, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.MUL, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
             elif opcode == Opcode.DIV:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.DIV, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.DIV, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
             elif opcode == Opcode.MOD:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.MOD, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.MOD, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
             elif opcode == Opcode.TEST:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.TEST, left_sel=left_sel, right_sel=right_sel)
-                self.data_path.signal_latch_general_register(
-                    num_reg_1, result_reg_sel)
+                self.data_path.signal_execute_alu_op(ALUOpcode.TEST, left_sel=left_sel, right_sel=right_sel)
+                self.data_path.signal_latch_general_register(num_reg_1, result_reg_sel)
 
     def execute_branch_instruction(self, opcode: Opcode, ps: dict):
         if opcode == Opcode.JG:
             if not ps["N"]:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                 self.data_path.signal_latch_pc()
         elif opcode == Opcode.JNG:
             if ps["N"]:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                 self.data_path.signal_latch_pc()
         elif opcode == Opcode.JZ:
             if ps["Z"]:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                 self.data_path.signal_latch_pc()
 
         elif opcode == Opcode.JNZ:
             if not ps["Z"]:
-                self.data_path.signal_execute_alu_op(
-                    ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+                self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                 self.data_path.signal_latch_pc()
 
         elif opcode == Opcode.JMP:
-            self.data_path.signal_execute_alu_op(
-                ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
+            self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
             self.data_path.signal_latch_pc()
 
     def decode_and_execute_instruction(self):
@@ -618,10 +579,8 @@ def simulation(code: list, input_tokens: list, limit: int) -> tuple[list, list, 
 
     if instr_counter >= limit:
         logging.warning("Limit exceeded!")
-    logging.info("output_str_buffer: %s", repr(
-        "".join(data_path.output_str_buffer)))
-    logging.info("output_int_buffer: [%s]", ", ".join(
-        str(x) for x in data_path.output_int_buffer))
+    logging.info("output_str_buffer: %s", repr("".join(data_path.output_str_buffer)))
+    logging.info("output_int_buffer: [%s]", ", ".join(str(x) for x in data_path.output_int_buffer))
     symbols = data_path.output_str_buffer
     numbers = data_path.output_int_buffer
     return symbols, numbers, instr_counter
@@ -641,8 +600,7 @@ def main(code_file: str, input_file: str):
     code = read_code(code_file)
     input_token = parse_to_tokens(input_file)
 
-    output_symbols, output_numbers, instr_counter = simulation(
-        code, input_token, limit=500)
+    output_symbols, output_numbers, instr_counter = simulation(code, input_token, limit=500)
 
     print("".join(output_symbols))
     print(output_numbers)
@@ -655,7 +613,6 @@ if __name__ == "__main__":
     logging.basicConfig(format=FORMAT)
     logging.getLogger().setLevel(logging.DEBUG)
 
-    assert len(
-        sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
+    assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
     _, code_file, input_file = sys.argv
     main(code_file, input_file)
