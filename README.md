@@ -7,7 +7,7 @@
 Вариант (упрощённый)
 ---
 > Базовый вариант: alg | risc | neum | hw | instr | binary | stream | mem | pstr | prob1 | cache
-Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
+> Вариант после упрощения: asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1 | cache
 
 Синтаксис языка
 ---
@@ -53,6 +53,8 @@ op1 ::= "inc"
 
 op2 ::= "add" 
       | "sub"
+      | "mul"
+      | "div"	
       | "mod"
       | "test"
       
@@ -83,6 +85,8 @@ comment ::= ";" { <any symbol except "\n"> }
 Результаты сохраняются в первом регистре команды
 * ```add { register register }``` - сложение первого и второго регистра
 * ```sub { register register }``` - вычитание первого и второго регистра
+* ```mul { register register }``` - умножение первого и второго регистра
+* ```div { register register }``` - деление первого регистра на второй
 * ```mod { register register }``` - нахождение остатка деления первого регистра на второй
 * ```test {register register}``` - логическое умножение двух регистров
 #### op3 (Команды ветвления)
@@ -98,8 +102,8 @@ comment ::= ";" { <any symbol except "\n"> }
 ### Семантика
 * Глобальная видимость данных
 * Есть поддержка литералов (Чисельных и строковых)
-    + Пример объявления литерала: `.word 10000` или `.word 'Hello world!'
-* Строки хранятся в виде Паскаль-подобных
+    + Пример объявления литерала: `.word 10000` или `.word `'Hello world!'`
+* Строки хранятся в виде `Паскаль-подобных` (Сначала идёт длина строки, потом сама строка)
 * Метка `_start` является началом программы
 * Текст, написанный после `;` является комментарием
 * Выполнение кода происходит последовательно. Возможен переход на другие участки кода при помощи команд ветвления. Поддержка подпрограмм отсутствует
@@ -181,7 +185,7 @@ comment ::= ";" { <any symbol except "\n"> }
 Транслятор
 ---
 Интерфейс командной строки: ``` python translator.py <source_file> <target_file>```
-Реализовано в модуле: translator.py
+Реализовано в модуле: [translator.py](https://github.com/MyximAnisimov/CSA-lab3/blob/main/translator.py)
 Этапы трансляции (функция ```translate```):
 1. Очистка исходного текста от лишних пробелов, комментариев и пустых строк (функция ```clean_source```)
 2. Выделение переменных программы (функция ```translate_section_data```)
@@ -207,7 +211,7 @@ comment ::= ";" { <any symbol except "\n"> }
 ---
 Интерфейс командной строки: ```machine.py <machine_code_file> <input_file>```
 
-Реализовано в модуле: machine
+Реализовано в модуле: [machine](https://github.com/MyximAnisimov/CSA-lab3/blob/main/machine.py)
 ### DataPath
 ![Image alt](https://github.com/MyximAnisimov/itmo_study/blob/main/2_year/Computer_Architecture/Labwork3/DataPath1.png)
 
@@ -217,36 +221,36 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Регистры (соответствуют регистрам на схеме):
 
-+ ```Registers``` - регистры общего назначения
-    +```r0```
-    +```r1```
-    +```r2```
-    +```r3```
+- ```Registers``` - регистры общего назначения
+    -```r0```
+    -```r1```
+    -```r2```
+    -```r3```
 
-+ Служебные регистры
-    +```pc``` - счетчик команд
-    +```ps``` - регистр состояния
-    +```ar``` - адресный регистр
-    +```ir``` - регистр команды
-    +```dr``` - регистр данных, нужен при косвенной адресации
+- Служебные регистры
+    -```pc``` - счетчик команд
+    -```ps``` - регистр состояния
+    -```ar``` - адресный регистр
+    -```ir``` - регистр команды
+    -```dr``` - регистр данных, нужен при косвенной адресации
 
 Объекты:
 
-+```input_buffer``` - входной буфер данных
+-```input_buffer``` - входной буфер данных
     +адрес в памяти = 1
-+```output_symbol_buffer``` - выходной буфер для символов
+-```output_symbol_buffer``` - выходной буфер для символов
     +адрес в памяти = 2
-+```output_numeric_buffer``` - выходной буфер для чисел
+-```output_numeric_buffer``` - выходной буфер для чисел
     +адрес в памяти = 3
-+```alu``` - арифметико-логическое устройство
+-```alu``` - арифметико-логическое устройство
     +мультиплексоры реализованы в виде Enum (Selectors) в модуле isa
     +операции алу реализованы в виде Enum (ALUOpcode) в модуле isa
 Сигналы (реализованы в виде методов класса ```DataPath```):
 
-+```signal_fill_memory``` - заполнить память программой
-+```signal_latch_<reg>``` - защелкнуть регистр ```<reg>```
-+```signal_write``` - записать в память по адресу в ```ar```
-+```signal_execute_operation_on_alu``` - записать в память по адресу в ```ar```
+-```signal_fill_memory``` - заполнить память программой
+-```signal_latch_<reg>``` - защелкнуть регистр ```<reg>```
+-```signal_write``` - записать в память по адресу в ```ar```
+-```signal_execute_operation_on_alu``` - записать в память по адресу в ```ar```
 
 ### Control Unit
 ![Image alt](https://github.com/MyximAnisimov/itmo_study/blob/main/2_year/Computer_Architecture/Labwork3/ControlUnit.png)
@@ -262,3 +266,328 @@ comment ::= ";" { <any symbol except "\n"> }
 * Шаг моделирования соответствует одной инструкции с выводом состояния в журнал (каждая запись в журнале соответсвует состоянию процессора после выполнения инструкции)
 * Для журнала состояний процессора используется стандартный модуль ```logging```
 
+Тестирование
+---
+Реализованные программы:
+
+[hello](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello.asm) - напечатать hello world
+[cat](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/cat.asm) - печатать данные, поданные на вход симулятору через файл ввода (размер ввода потенциально бесконечен)
+[hello_user_name](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello_user_name.asm) - запросить у пользователя его имя, считать его, вывести на экран приветствие
+[prob1](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/prob2.asm) - вывести сумму чисел до 1000, кратных 3 или 5
+Интеграционные тесты реализованы в integration_test:
+
+Стратегия: golden tests, конфигурация в папке [golden](https://github.com/MyximAnisimov/CSA-lab3/tree/main/golden)
+
+### CI при помощи Github Action
+```name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/*"
+      - "**/*.py"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/*"
+      - "**/*.py"
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.3"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Run tests and collect coverage
+        run: |
+          poetry run coverage run -m pytest .
+          poetry run coverage report -m
+        env:
+          CI: true
+
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.3"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Check code formatting with Mypy
+        run: poetry run mypy .
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.3"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Check code formatting with Ruff
+        run: poetry run ruff format --check .
+
+      - name: Run Ruff linters
+        run: poetry run ruff check .
+```
+где:
+* `poetry` - управление зависимостями
+* `coverage` - формирование отчёта об уровне покрытия исходного кода
+* `pytest` - утилита для запуска тестов
+* `ruff` - линтер для проверки соответствия "хорошим практикам" программирования
+* `mypy` - проверка строгой типизации, при наличии
+
+### Пример использования
+Пример использования и журнал работы процессора на продемонстрирован на примере `cat`
+```
+C:\Users\user\CSA-lab3\examples\inputs\cat.txt
+[12, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!']
+
+C:\Users\user\CSA-lab3\examples\inputs\cat.asm
+ in_addr:
+   .word 1
+
+ out_addr:
+   .word 2
+
+ _start:
+   mov r0, (in_addr)
+   mov r1, r0
+  loop:
+   dec r1
+   jng exit
+   inc r1
+   mov r2, (in_addr)
+   dec r1
+   jg write
+   hlt
+
+ write:
+   mov (out_addr), r2
+   jmp loop
+
+ exit:
+     hlt
+
+C:\Users\user\CSA-lab3> poetry run translator.py examples\src\cat.asm examples\machine_codes\cat.json
+source LoC: 24 code instr: 15
+
+C:\Users\user\CSA-lab3> type examples\machine_codes\cat.json    
+[{"index": 0, "opcode": "jmp", "arg_1": "6", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 4, "opcode": "nop", "arg_1": "1", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 5, "opcode": "nop", "arg_1": "2", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 6, "opcode": "mov", "arg_1": "r0", "is_indirect_1": false, "arg_2": "4", "is_indirect_2": true},
+ {"index": 7, "opcode": "mov", "arg_1": "r1", "is_indirect_1": false, "arg_2": "r0", "is_indirect_2": false},
+ {"index": 8, "opcode": "dec", "arg_1": "r1", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 9, "opcode": "jng", "arg_1": "17", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 10, "opcode": "inc", "arg_1": "r1", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 11, "opcode": "mov", "arg_1": "r2", "is_indirect_1": false, "arg_2": "4", "is_indirect_2": true},
+ {"index": 12, "opcode": "dec", "arg_1": "r1", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 13, "opcode": "jg", "arg_1": "15", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 14, "opcode": "hlt", "arg_1": null, "is_indirect_1": null, "arg_2": null, "is_indirect_2": null},
+ {"index": 15, "opcode": "mov", "arg_1": "5", "is_indirect_1": true, "arg_2": "r2", "is_indirect_2": false},
+ {"index": 16, "opcode": "jmp", "arg_1": "8", "is_indirect_1": false, "arg_2": null, "is_indirect_2": null},
+ {"index": 17, "opcode": "hlt", "arg_1": null, "is_indirect_1": null, "arg_2": null, "is_indirect_2": null}]
+
+C:\Users\user\CSA-lab3> poetry run machine.py examples\machine_codes\cat.json examples\inputs\cat.txt         
+ DEBUG    machine.py     INSTR: jmp 6        | R0:        0 | R1:        0 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:    6
+ DEBUG    machine.py    input: 12
+ DEBUG    machine.py     INSTR: mov r0, (4)  | R0:       12 | R1:        0 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:    7     
+ DEBUG    machine.py     INSTR: mov r1, r0   | R0:       12 | R1:       12 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:       11 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:       11 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:       12 | R2:        0 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'H'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:       12 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:       11 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:       11 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: '' << 'H'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:       11 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:       11 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:       10 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:       10 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:       11 | R2:       72 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'e'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:       11 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:       10 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:       10 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'H' << 'e'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:       10 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:       10 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        9 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        9 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:       10 | R2:      101 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'l'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:       10 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'He' << 'l'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'l'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        9 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hel' << 'l'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        7 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        7 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        8 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'o'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        8 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        7 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        7 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hell' << 'o'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        7 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        7 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        6 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        6 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        7 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: ' '
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        7 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        6 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        6 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello' << ' '
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        6 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        6 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        5 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        5 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        6 | R2:       32 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'W'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        6 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        5 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        5 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello ' << 'W'
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        5 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        5 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        4 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        4 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        5 | R2:       87 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'o'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        5 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        4 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        4 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello W' << 'o'        
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        4 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        4 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        3 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        3 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        4 | R2:      111 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'r'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        4 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        3 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        3 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello Wo' << 'r'       
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        3 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        3 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        2 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        2 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        3 | R2:      114 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'l'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        3 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        2 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        2 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello Wor' << 'l'      
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        2 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        2 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        1 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        1 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        2 | R2:      108 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: 'd'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        2 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        1 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        1 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello Worl' << 'd'     
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        1 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        1 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        0 | R2:      100 | R3:        0 | N: 0 | Z: 1 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:        0 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   10     
+ DEBUG    machine.py     INSTR: inc r1       | R0:       12 | R1:        1 | R2:      100 | R3:        0 | N: 0 | Z: 0 | PC:   11     
+ DEBUG    machine.py    input: '!'
+ DEBUG    machine.py     INSTR: mov r2, (4)  | R0:       12 | R1:        1 | R2:       33 | R3:        0 | N: 0 | Z: 0 | PC:   12     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:        0 | R2:       33 | R3:        0 | N: 0 | Z: 1 | PC:   13     
+ DEBUG    machine.py     INSTR: jg 15        | R0:       12 | R1:        0 | R2:       33 | R3:        0 | N: 0 | Z: 0 | PC:   15     
+ DEBUG    machine.py    output_str_buffer: 'Hello World' << '!'    
+ DEBUG    machine.py     INSTR: mov (5), r2  | R0:       12 | R1:        0 | R2:       33 | R3:        0 | N: 0 | Z: 0 | PC:   16     
+ DEBUG    machine.py     INSTR: jmp 8        | R0:       12 | R1:        0 | R2:       33 | R3:        0 | N: 0 | Z: 0 | PC:    8     
+ DEBUG    machine.py     INSTR: dec r1       | R0:       12 | R1:       -1 | R2:       33 | R3:        0 | N: 1 | Z: 0 | PC:    9     
+ DEBUG    machine.py     INSTR: jng 17       | R0:       12 | R1:       -1 | R2:       33 | R3:        0 | N: 0 | Z: 0 | PC:   17     
+ INFO    machine.py    output_str_buffer: 'Hello World!'
+ INFO    machine.py    output_int_buffer: []
+Hello World!
+[]
+instr_counter:  101
+```
+
+### Пример проверки исходного кода
+```
+C:\Users\user\CSA-lab3> poetry run pytest . -v
+====================== test session starts =======================
+platform win32 -- Python 3.12.3, pytest-7.4.4, pluggy-1.5.0 -- C:\U
+sers\user\AppData\Local\pypoetry\Cache\virtualenvs\csa-lab3-LX7E7N-U-py3.12\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\user\CSA-lab3
+configfile: pytest.ini
+plugins: golden-0.2.2
+collected 5 items                                                 
+
+integration_test.py::test_translator_and_machine[golden/cat.yml] PASSED [ 20%]
+integration_test.py::test_translator_and_machine[golden/hello.yml] PASSED [ 40%]
+integration_test.py::test_translator_and_machine[golden/hello_user_name.yml] PASSED [ 60%]
+integration_test.py::test_translator_and_machine[golden/prob1.yml] PASSED [ 80%]
+integration_test.py::test_translator_and_machine[golden/test.yml] PASSED [100%]
+
+======================= 5 passed in 0.49s ========================
+```
+| ФИО                        | алг             | LoC | code байт | code инстр. | инстр. | такт. | вариант                                                                   |
+| Анисимов Максим Дмитриевич | hello           | 43  | -         | 43          | 114    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+| Анисимов Максим Дмитриевич | cat             | 24  | -         | 15          | 101    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+| Анисимов Максим Дмитриевич | hello_user_name | 120 | -         | 106         | 339    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+| Анисимов Максим Дмитриевич | prob1           | 56  | -         | 37          | 500    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+| Анисимов Максим Дмитриевич | test            | 46  | -         | 46          | 130    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+```
