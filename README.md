@@ -18,12 +18,16 @@
 ---
 
 Синтаксис в расширенной БНФ
+
 * `[...]` - вхождение 0 или 1 раз
 * `{...}` - вхождение 0 или несколько раз
 * `{...}`- - вхождение 1 или несколько раз
 
 ### Форма Бэкуса-Наура
+
+
 ```
+
 program ::= { program_line }-
 
 program_line ::= code_line [ comment ]
@@ -79,33 +83,47 @@ positive_integer :: = { <any of "0-9"> }-
 string ::= "\'" { <any of "a-z A-Z">}- "\'"
 
 comment ::= ";" { <any symbol except "\n"> }
+
 ```
+
 ### Команды
+
 #### op0 (Безадресные команды)
+
 * ```nop``` - нет операции
 * ```hlt``` - остановка работы программы
+
 #### op1 (Адресные команды)
+
 * ```inc { register }``` - операция инкрементации значения в регистре
 * ```dec { register }``` - операция декрментации значения в регистре
+
 #### op2 (Адресные команды)
+
 Результаты сохраняются в первом регистре команды
+
 * ```add { register register }``` - сложение первого и второго регистра
 * ```sub { register register }``` - вычитание первого и второго регистра
 * ```mul { register register }``` - умножение первого и второго регистра
 * ```div { register register }``` - деление первого регистра на второй
 * ```mod { register register }``` - нахождение остатка деления первого регистра на второй
 * ```test {register register}``` - логическое умножение двух регистров
+
 #### op3 (Команды ветвления)
+
 * ```jg { label_name }``` - переход по адресу label_name, если флаг N = 0 (Результат вычислений положительный)
 * ```jng { label_name }``` - переход по адресу label_name, если флаг N != 0 (Результат вычислений отрицательный)
 * ```jz {label_name }``` - переход по адресу label_name если флаг Z = 0 (Результат вычислений равен 0)
 * ```jnz { label_name }``` - переход на указанную метку если Z != 0 (Результат вычислений не равен 0)
 * ```jmp { label_name }``` - безусловный переход по адресу
+
 #### op4 (Адресная команда)
+
 * ```mov { register, address }``` - загрузить значение из address в register
 * ```mov { address, register }``` - загрузить значение из register в address
 
 ### Семантика
+
 * Глобальная видимость данных
 * Есть поддержка литералов (Чисельных и строковых)
     + Пример объявления литерала: `.word 10000` или `.word `'Hello world!'`
@@ -116,9 +134,12 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Организация памяти
 ---
+
 * Архитектура фон-Неймана
 * Машинное слово - не определено
+
 ### Схема памяти
+
 ```
           registers    
 +----------------------------+
@@ -150,23 +171,31 @@ comment ::= ";" { <any symbol except "\n"> }
 * В ячейках с `03` по `n` хранятся переменные, используемые в программе:
     + Целочисельные
     + Строковые
+
 ### Адресация памяти
+
 - Асболютная адресация
 - Косвенная адресация
 
 Система команд
 ---
+
 ### Особенности процессора
+
 * Машинное слово - не определено. Инструкции хранятся как высокоуровневая структура
 * Пользователь может оперировать только четырьмя регистрами общего назначения `r0 - r3`. Служебные регистры используются самим процессором
 * Ввод-вывод осуществляется асинхронно. В качестве устройства для ввода-вывода используются 3 ячейки общей памяти: одна для ввода, две другие для вывода целочисельных и строковых данных
 * Поток управления:
     + Поддерживаются условные и безусловные переходы. Если условие перехода не выполняется, то осуществляется инкрементация регистра `IP`
+
 ### Кодирование инструкций
+
 * Машинный код сериализуется в список JSON
 * Один элемент списка - однак инструкция
 Пример:
+
 ```
+
 [
    {
      "index": 0,
@@ -177,8 +206,11 @@ comment ::= ";" { <any symbol except "\n"> }
      "is_indirect_2": false
    }
 ]
+
 ```
+
 где:
+
 * `index` - адрес памяти
 * `opcode` - код операции
 * `arg_1` - первый аргумент
@@ -190,6 +222,7 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Транслятор
 ---
+
 Интерфейс командной строки: ``` python translator.py <source_file> <target_file>```
 Реализовано в модуле: [translator.py](https://github.com/MyximAnisimov/CSA-lab3/blob/main/translator.py)
 Этапы трансляции (функция ```translate```):
@@ -215,10 +248,13 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Модель процессора
 ---
+
 Интерфейс командной строки: ```machine.py <machine_code_file> <input_file>```
 
 Реализовано в модуле: [machine](https://github.com/MyximAnisimov/CSA-lab3/blob/main/machine.py)
+
 ### DataPath
+
 ![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
 
 Реализован в классе ```DataPath```
@@ -259,6 +295,7 @@ comment ::= ";" { <any symbol except "\n"> }
 -```signal_execute_operation_on_alu``` - записать в память по адресу в ```ar```
 
 ### Control Unit
+
 ![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/ControlUnit.png)
 
 Реализован в классе ```ControlUnit```
@@ -274,6 +311,7 @@ comment ::= ";" { <any symbol except "\n"> }
 
 Тестирование
 ---
+
 Реализованные программы:
 
 [hello](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello.asm) - напечатать hello world
@@ -285,7 +323,10 @@ comment ::= ";" { <any symbol except "\n"> }
 Стратегия: golden tests, конфигурация в папке [golden](https://github.com/MyximAnisimov/CSA-lab3/tree/main/golden)
 
 ### CI при помощи Github Action
-```name: Python CI
+
+```
+
+name: Python CI
 
 on:
   push:
@@ -378,6 +419,7 @@ jobs:
         run: poetry run ruff check .
 ```
 где:
+
 * `poetry` - управление зависимостями
 * `coverage` - формирование отчёта об уровне покрытия исходного кода
 * `pytest` - утилита для запуска тестов
@@ -385,8 +427,11 @@ jobs:
 * `mypy` - проверка строгой типизации, при наличии
 
 ### Пример использования
+
 Пример использования и журнал работы процессора на продемонстрирован на примере `cat`
+
 ```
+
 C:\Users\user\CSA-lab3\examples\inputs\cat.txt
 [12, 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!']
 
@@ -568,10 +613,13 @@ C:\Users\user\CSA-lab3> poetry run machine.py examples\machine_codes\cat.json ex
 Hello World!
 []
 instr_counter:  101
+
 ```
 
 ### Пример проверки исходного кода
+
 ```
+
 C:\Users\user\CSA-lab3> poetry run pytest . -v
 ====================== test session starts =======================
 platform win32 -- Python 3.12.3, pytest-7.4.4, pluggy-1.5.0 -- C:\U
@@ -589,12 +637,16 @@ integration_test.py::test_translator_and_machine[golden/prob1.yml] PASSED [ 80%]
 integration_test.py::test_translator_and_machine[golden/test.yml] PASSED [100%]
 
 ======================= 5 passed in 0.49s ========================
+
 ```
+
 ```
+
 | ФИО                        | алг             | LoC | code байт | code инстр. | инстр. | такт. | вариант                                                                   |
 | Анисимов Максим Дмитриевич | hello           | 43  | -         | 43          | 114    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
 | Анисимов Максим Дмитриевич | cat             | 24  | -         | 15          | 101    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
 | Анисимов Максим Дмитриевич | hello_user_name | 120 | -         | 106         | 339    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
 | Анисимов Максим Дмитриевич | prob1           | 56  | -         | 37          | 500    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
 | Анисимов Максим Дмитриевич | test            | 46  | -         | 46          | 130    | -     | asm | risc | neum | hw | instr | struct | stream | mem | pstr | prob1     |
+
 ```
