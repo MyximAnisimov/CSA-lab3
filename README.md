@@ -63,7 +63,7 @@ op1 ::= "inc"
 op2 ::= "add" 
       | "sub"
       | "mul"
-      | "div"	
+      | "div"
       | "mod"
       | "test"
       
@@ -113,7 +113,6 @@ comment ::= ";" { <any symbol except "\n"> }
     * `jz {label_name }` - переход по адресу label_name если флаг Z = 0 (Результат вычислений равен 0)
     * `jnz { label_name }` - переход на указанную метку если Z != 0 (Результат вычислений не равен 0)
     * `jmp { label_name }` - безусловный переход по адресу
-
 
 5. op4 (Адресная команда)
 
@@ -329,7 +328,8 @@ ControlUnit
 
 Стратегия: golden tests, конфигурация в папке [golden](https://github.com/MyximAnisimov/CSA-lab3/tree/main/golden)
 
-**CI при помощи Github Action**
+CI при помощи Github Action
+---
 
 ```bash
 
