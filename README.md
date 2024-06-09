@@ -256,7 +256,7 @@ comment ::= ";" { <any symbol except "\n"> }
 DataPath
 ---
 
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
+![Image alt](schemes/DataPath1.svg)
 
 Реализован в классе `DataPath`
 
