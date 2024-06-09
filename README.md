@@ -320,10 +320,10 @@ ControlUnit
 
 Реализованные программы:
 
-[hello](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello.asm) - напечатать hello world
-[cat](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/cat.asm) - печатать данные, поданные на вход симулятору через файл ввода (размер ввода потенциально бесконечен)
-[hello_user_name](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello_user_name.asm) - запросить у пользователя его имя, считать его, вывести на экран приветствие
-[prob1](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/prob2.asm) - вывести сумму чисел до 1000, кратных 3 или 5
+* [hello](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello.asm) - напечатать hello world
+* [cat](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/cat.asm) - печатать данные, поданные на вход симулятору через файл ввода (размер ввода потенциально бесконечен)
+* [hello_user_name](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/hello_user_name.asm) - запросить у пользователя его имя, считать его, вывести на экран приветствие
+* [prob1](https://github.com/MyximAnisimov/CSA-lab3/blob/main/examples/src/prob2.asm) - вывести сумму чисел до 1000, кратных 3 или 5
 Интеграционные тесты реализованы в integration_test:
 
 Стратегия: golden tests, конфигурация в папке [golden](https://github.com/MyximAnisimov/CSA-lab3/tree/main/golden)
