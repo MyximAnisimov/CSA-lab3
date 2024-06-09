@@ -302,7 +302,7 @@ DataPath
 ControlUnit
 ---
 
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/ControlUnit.png)
+![Image alt](schemes/ControlUnit.png)
 
 Реализован в классе `ControlUnit`
 
