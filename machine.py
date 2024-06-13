@@ -214,6 +214,7 @@ class DataPath:
 
     def signal_latch_br(self, sel: Selectors):
         self.signal_write(sel)
+
     def signal_latch_ar(self, sel: Selectors):
         assert sel in [Selectors.FROM_ADDR1_TO_AR, Selectors.FROM_ADDR2_TO_AR], f"Unknown selector '{sel}'"
         if sel == Selectors.FROM_ADDR1_TO_AR:
