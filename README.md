@@ -256,8 +256,7 @@ comment ::= ";" { <any symbol except "\n"> }
 DataPath
 ---
 
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/DataPath.svg)
-
+![Image alt](schemes/DataPath.svg)
 Реализован в классе `DataPath`
 
 `memory` - однопортовая память, чтение и запись выполняются поочерёдно
@@ -302,7 +301,7 @@ DataPath
 ControlUnit
 ---
 
-![Image alt](https://github.com/MyximAnisimov/CSA-lab3/tree/main/schemes/ControlUnit.png)
+![Image alt](schemes/ControlUnit.png)
 
 Реализован в классе `ControlUnit`
 

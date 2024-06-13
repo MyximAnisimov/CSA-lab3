@@ -212,6 +212,8 @@ class DataPath:
     def signal_latch_pc(self):
         self.pc["arg_1"] = int(self.alu.result["arg_1"])
 
+    def signal_latch_br(self, sel: Selectors):
+        self.signal_write(sel)
     def signal_latch_ar(self, sel: Selectors):
         assert sel in [Selectors.FROM_ADDR1_TO_AR, Selectors.FROM_ADDR2_TO_AR], f"Unknown selector '{sel}'"
         if sel == Selectors.FROM_ADDR1_TO_AR:
@@ -456,7 +458,7 @@ class ControlUnit:
                 else:
                     self.data_path.signal_execute_alu_op(ALUOpcode.SKIP_B, right_sel=Selectors.FROM_IR_TO_ALU_B)
                     self.data_path.signal_latch_ar(Selectors.FROM_ADDR1_TO_AR)
-                    self.data_path.signal_write(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
+                    self.data_path.signal_latch_br(Selectors[f"from_r{num_reg_2}_to_memory".upper()])
             else:
                 error_message = "Mem-to-mem operations prohibited"
                 raise AssertionError(error_message)
